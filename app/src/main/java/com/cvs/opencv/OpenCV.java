@@ -1,7 +1,6 @@
 package com.cvs.opencv;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.awt.*;
@@ -13,20 +12,23 @@ import java.awt.image.DataBufferByte;
  */
 public class OpenCV {
 
-    public static BufferedImage greyScale(BufferedImage image) {
-        Mat matImage = imageToMat(image);
-
-        Mat matDest = new Mat(image.getHeight(),image.getWidth(),CvType.CV_8UC1);
-        Imgproc.cvtColor(matImage, matDest, Imgproc.COLOR_RGB2GRAY);
-
-        return matToImage(matDest, BufferedImage.TYPE_BYTE_GRAY);
+    public static Mat imageToMat(BufferedImage bufferedImage) {
+        return imageToMat(bufferedImage, CvType.CV_8UC3);
     }
 
-    public static Mat imageToMat(BufferedImage bufferedImage) {
+    public static Mat imageToMat(BufferedImage bufferedImage, int cvType) {
         byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
-        Mat matImage = new Mat(bufferedImage.getHeight(), bufferedImage.getWidth(), CvType.CV_8UC3);
+        Mat matImage = new Mat(bufferedImage.getHeight(), bufferedImage.getWidth(), cvType);
         matImage.put(0, 0, pixels);
         return matImage;
+    }
+
+    public static BufferedImage matToImage(Mat mat) {
+        int channels = mat.channels();
+        if (channels == 1) {
+            return matToImage(mat, BufferedImage.TYPE_BYTE_GRAY);
+        }
+        return matToImage(mat, BufferedImage.TYPE_3BYTE_BGR);
     }
 
     public static BufferedImage matToImage(Mat mat, int bufferedImageType) {
