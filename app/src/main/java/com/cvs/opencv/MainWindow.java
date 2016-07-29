@@ -1,9 +1,6 @@
 package com.cvs.opencv;
 
-import com.cvs.opencv.filters.Blur;
-import com.cvs.opencv.filters.Canny;
-import com.cvs.opencv.filters.GrayScale;
-import com.cvs.opencv.filters.ImageFilter;
+import com.cvs.opencv.filters.*;
 import com.cvs.opencv.view.FilterAddView;
 import com.cvs.opencv.view.FilterListModel;
 import com.cvs.opencv.view.ImagePanel;
@@ -83,6 +80,7 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
         mainWindow.filtersPanel.add(new FilterAddView(GrayScale.getDefault(), mainWindow), filterConstraints(0));
         mainWindow.filtersPanel.add(new FilterAddView(Blur.getDefault(), mainWindow), filterConstraints(1));
         mainWindow.filtersPanel.add(new FilterAddView(Canny.getDefault(), mainWindow), filterConstraints(2));
+        mainWindow.filtersPanel.add(new FilterAddView(Dilate.getDefault(), mainWindow), filterConstraints(3));
 
         jFrame.setContentPane(mainWindow.mainPanel);
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
