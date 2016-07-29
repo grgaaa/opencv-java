@@ -1,4 +1,4 @@
-package com.cvs.opencv;
+package com.cvs.opencv.view;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

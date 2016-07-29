@@ -6,6 +6,8 @@ import com.cvs.opencv.filters.GrayScale;
 import com.cvs.opencv.filters.ImageFilter;
 import com.cvs.opencv.view.FilterAddView;
 import com.cvs.opencv.view.FilterListModel;
+import com.cvs.opencv.view.ImagePanel;
+import com.cvs.opencv.view.MouseClickListener;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
@@ -70,6 +72,7 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
             @Override
             public void mouseClicked(MouseEvent e) {
                 mainWindow.filterListModel.clear();
+                mainWindow.showFilterSettings(null);
 
                 mainWindow.img1.reloadSourceImage();
                 mainWindow.img2.reloadSourceImage();
@@ -102,7 +105,9 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
 
     private void showFilterSettings(ImageFilter filter) {
         filterSettings.removeAll();
-        filterSettings.add(filter.getSettingsView());
+        if (filter != null) {
+            filterSettings.add(filter.getSettingsView());
+        }
         filterSettings.revalidate();
         filterSettings.repaint();
     }

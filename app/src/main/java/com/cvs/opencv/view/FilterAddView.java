@@ -1,6 +1,5 @@
 package com.cvs.opencv.view;
 
-import com.cvs.opencv.MouseClickListener;
 import com.cvs.opencv.filters.ImageFilter;
 
 import javax.swing.*;

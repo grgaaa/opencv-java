@@ -6,6 +6,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import javax.swing.*;
+import javax.swing.text.DefaultFormatter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -40,7 +41,10 @@ public class Blur implements ImageFilter {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.add(new JLabel("kernel size"));
 
-        final JFormattedTextField kernelSizeInput = new JFormattedTextField();
+        DefaultFormatter formatter = new DefaultFormatter();
+        formatter.setCommitsOnValidEdit(true);
+
+        final JFormattedTextField kernelSizeInput = new JFormattedTextField(formatter);
 
         kernelSizeInput.setText(""+kernelSize);
         kernelSizeInput.addPropertyChangeListener(new PropertyChangeListener() {

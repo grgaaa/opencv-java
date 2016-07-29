@@ -1,4 +1,4 @@
-package com.cvs.opencv;
+package com.cvs.opencv.view;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

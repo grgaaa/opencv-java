@@ -5,7 +5,12 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultFormatter;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -22,7 +27,7 @@ public class Canny implements ImageFilter {
         this.threshold1 = threshold1;
         this.threshold2 = threshold2;
         this.apertureSize = apertureSize;
-        L2gradient = l2gradient;
+        this.L2gradient = l2gradient;
     }
 
     public static ImageFilter getDefault() {
@@ -42,41 +47,70 @@ public class Canny implements ImageFilter {
     public Component getSettingsView() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
+        SettingsChangeListener settingsChangeListener = new SettingsChangeListener();
+        DefaultFormatter formatter = new DefaultFormatter();
+        formatter.setCommitsOnValidEdit(true);
+
         panel.add(new JLabel("threshold1"));
-        final JFormattedTextField threshold1Input = new JFormattedTextField(""+threshold1);
-        threshold1Input.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (NumberUtils.isNumber(threshold1Input.getText())) {
-                    threshold1 = Double.parseDouble(threshold1Input.getText());
-                }
-            }
-        });
+        final JFormattedTextField threshold1Input = new JFormattedTextField(formatter);
+        threshold1Input.setText(""+threshold1);
+        threshold1Input.addPropertyChangeListener(SettingsChangeListener.THRESHOLD_1, settingsChangeListener);
         panel.add(threshold1Input);
 
         panel.add(new JLabel("threshold2"));
-        final JFormattedTextField threshold2Input = new JFormattedTextField(""+threshold2);
-        threshold2Input.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (NumberUtils.isNumber(threshold2Input.getText())) {
-                    threshold2 = Double.parseDouble(threshold2Input.getText());
-                }
-            }
-        });
+        final JFormattedTextField threshold2Input = new JFormattedTextField(formatter);
+        threshold2Input.setText(""+threshold2);
+        threshold2Input.addPropertyChangeListener(SettingsChangeListener.THRESHOLD_2, settingsChangeListener);
         panel.add(threshold2Input);
 
         panel.add(new JLabel("aperture size"));
-        final JFormattedTextField apertureSizeInput = new JFormattedTextField(""+apertureSize);
-        apertureSizeInput.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (NumberUtils.isDigits(apertureSizeInput.getText())) {
-                    apertureSize = Integer.parseInt(apertureSizeInput.getText());
-                }
+        final JFormattedTextField apertureSizeInput = new JFormattedTextField(formatter);
+        apertureSizeInput.setText(""+apertureSize);
+        apertureSizeInput.addPropertyChangeListener(SettingsChangeListener.APERTURE_SIZE, settingsChangeListener);
+        panel.add(apertureSizeInput);
+
+        final JCheckBox L2gradientCheckbox = new JCheckBox("L2gradient", L2gradient);
+        L2gradientCheckbox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                L2gradient = L2gradientCheckbox.isSelected();
             }
         });
-        panel.add(apertureSizeInput);
+        panel.add(L2gradientCheckbox);
 
         return panel;
     }
+
+    private class SettingsChangeListener implements PropertyChangeListener {
+        static final String THRESHOLD_1 = "thr1";
+        static final String THRESHOLD_2 = "thr2";
+        static final String APERTURE_SIZE = "aps";
+        static final String L2_GRADIENT = "l2g";
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            String propertyName = evt.getPropertyName();
+            Object source = evt.getSource();
+            if (THRESHOLD_1.equals(propertyName)) {
+                JFormattedTextField threshold1Input = (JFormattedTextField)source;
+                if (NumberUtils.isNumber(threshold1Input.getText())) {
+                    threshold1 = Double.parseDouble(threshold1Input.getText());
+                }
+            } else if (THRESHOLD_2.equals(propertyName)) {
+                JFormattedTextField threshold2Input = (JFormattedTextField)source;
+                if (NumberUtils.isNumber(threshold2Input.getText())) {
+                    threshold1 = Double.parseDouble(threshold2Input.getText());
+                }
+            } else if (APERTURE_SIZE.equals(propertyName)) {
+                JFormattedTextField apertureSizeInput = (JFormattedTextField)source;
+                if (NumberUtils.isDigits(apertureSizeInput.getText())) {
+                    apertureSize = Integer.parseInt(apertureSizeInput.getText());
+                }
+            } else if (L2_GRADIENT.equals(propertyName)) {
+                JCheckBox L2gradientCheckbox = (JCheckBox)source;
+                L2gradient = L2gradientCheckbox.isSelected();
+            }
+        }
+    }
+
 
     @Override
     public boolean equals(Object o) {
