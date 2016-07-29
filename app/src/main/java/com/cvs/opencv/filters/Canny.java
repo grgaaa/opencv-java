@@ -1,7 +1,13 @@
 package com.cvs.opencv.filters;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Created by gregor.horvat on 27. 07. 2016.
@@ -31,6 +37,45 @@ public class Canny implements ImageFilter {
 
     public String label() {
         return "Canny";
+    }
+
+    public Component getSettingsView() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        panel.add(new JLabel("threshold1"));
+        final JFormattedTextField threshold1Input = new JFormattedTextField(""+threshold1);
+        threshold1Input.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (NumberUtils.isNumber(threshold1Input.getText())) {
+                    threshold1 = Double.parseDouble(threshold1Input.getText());
+                }
+            }
+        });
+        panel.add(threshold1Input);
+
+        panel.add(new JLabel("threshold2"));
+        final JFormattedTextField threshold2Input = new JFormattedTextField(""+threshold2);
+        threshold2Input.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (NumberUtils.isNumber(threshold2Input.getText())) {
+                    threshold2 = Double.parseDouble(threshold2Input.getText());
+                }
+            }
+        });
+        panel.add(threshold2Input);
+
+        panel.add(new JLabel("aperture size"));
+        final JFormattedTextField apertureSizeInput = new JFormattedTextField(""+apertureSize);
+        apertureSizeInput.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (NumberUtils.isDigits(apertureSizeInput.getText())) {
+                    apertureSize = Integer.parseInt(apertureSizeInput.getText());
+                }
+            }
+        });
+        panel.add(apertureSizeInput);
+
+        return panel;
     }
 
     @Override

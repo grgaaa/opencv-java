@@ -4,6 +4,9 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Created by gregor.horvat on 27. 07. 2016.
  */
@@ -21,6 +24,12 @@ public class GrayScale implements ImageFilter {
 
     public String label() {
         return "Gray scale";
+    }
+
+    public Component getSettingsView() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.add(new JLabel("No editable options."));
+        return panel;
     }
 
     @Override

@@ -8,10 +8,11 @@ import com.cvs.opencv.view.FilterAddView;
 import com.cvs.opencv.view.FilterListModel;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -37,7 +38,6 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     private ImagePanel img3;
     private JList filterList;
     private JPanel filterSettings;
-    private JPanel mainButtonsPanel;
     private JButton applyBtn;
     private JButton clearBtn;
     private JPanel filtersPanel;
@@ -49,6 +49,14 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
         final JFrame jFrame = new JFrame("OpenCV");
 
         mainWindow.filterList.setModel(mainWindow.filterListModel);
+        mainWindow.filterList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        final ListSelectionModel selectionModel = mainWindow.filterList.getSelectionModel();
+        selectionModel.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                int index = selectionModel.getMinSelectionIndex();
+                mainWindow.showFilterSettings(mainWindow.filterListModel.getFilters().get(index));
+            }
+        });
 
         mainWindow.previewPanel.setBackground(Color.CYAN);
         mainWindow.toolbarPanel.setBackground(Color.DARK_GRAY);
@@ -89,6 +97,14 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
 
     public void onAddFilterClick(ImageFilter filter) {
         filterListModel.addFilter(filter);
+        filterList.setSelectedIndex(filterListModel.getSize()-1);
+    }
+
+    private void showFilterSettings(ImageFilter filter) {
+        filterSettings.removeAll();
+        filterSettings.add(filter.getSettingsView());
+        filterSettings.revalidate();
+        filterSettings.repaint();
     }
 
     private static class ApplyFiltersClickListener extends MouseClickListener {
@@ -117,8 +133,6 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
             new Thread(new Runnable() {
                 public void run() {
                     BufferedImage bufferedImage = imagePanel.getBufferedImage();
-//                    Image scaledInstance = bufferedImage.getScaledInstance(imagePanel.getWidth(), imagePanel.getHeight(), Image.SCALE_SMOOTH);
-//                    Mat imageMat = OpenCV.imageToMat(OpenCV.toBufferedImage(scaledInstance));
                     Mat imageMat = OpenCV.imageToMat(OpenCV.toBufferedImage(bufferedImage));
 
                     for (ImageFilter imageFilter : imageFilters) {

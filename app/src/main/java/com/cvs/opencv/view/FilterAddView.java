@@ -31,8 +31,8 @@ public class FilterAddView extends JPanel {
             }
         });
 
-        add(filterTitleJText);
         add(addToFilterListJButton);
+        add(filterTitleJText);
     }
 
     public void setOnAddFilterClickListener(OnAddFilterClickListener onAddFilterClickListener) {
