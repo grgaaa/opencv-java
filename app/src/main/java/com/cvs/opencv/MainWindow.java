@@ -57,9 +57,6 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
             }
         });
 
-        mainWindow.previewPanel.setBackground(Color.CYAN);
-        mainWindow.toolbarPanel.setBackground(Color.DARK_GRAY);
-
         mainWindow.img1.addMouseListener(new ImageSelectListener(jFrame, mainWindow.img1));
         mainWindow.img2.addMouseListener(new ImageSelectListener(jFrame, mainWindow.img2));
         mainWindow.img3.addMouseListener(new ImageSelectListener(jFrame, mainWindow.img3));
@@ -81,6 +78,7 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
         mainWindow.filtersPanel.add(new FilterAddView(Blur.getDefault(), mainWindow), filterConstraints(1));
         mainWindow.filtersPanel.add(new FilterAddView(Canny.getDefault(), mainWindow), filterConstraints(2));
         mainWindow.filtersPanel.add(new FilterAddView(Dilate.getDefault(), mainWindow), filterConstraints(3));
+        mainWindow.filtersPanel.add(new FilterAddView(Threshold.getDefault(), mainWindow), filterConstraints(4));
 
         jFrame.setContentPane(mainWindow.mainPanel);
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
