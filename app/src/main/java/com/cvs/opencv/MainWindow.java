@@ -79,6 +79,7 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
         mainWindow.filtersPanel.add(new FilterAddView(Canny.getDefault(), mainWindow), filterConstraints(2));
         mainWindow.filtersPanel.add(new FilterAddView(Dilate.getDefault(), mainWindow), filterConstraints(3));
         mainWindow.filtersPanel.add(new FilterAddView(Threshold.getDefault(), mainWindow), filterConstraints(4));
+        mainWindow.filtersPanel.add(new FilterAddView(FindSquares.getDefault(), mainWindow), filterConstraints(5));
 
         jFrame.setContentPane(mainWindow.mainPanel);
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -102,7 +103,14 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     private void showFilterSettings(ImageFilter filter) {
         filterSettings.removeAll();
         if (filter != null) {
-            filterSettings.add(filter.getSettingsView());
+            Component settingsView = filter.getSettingsView();
+
+            if (settingsView == null) {
+                JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                panel.add(new JLabel("No editable options."));
+                settingsView = panel;
+            }
+            filterSettings.add(settingsView);
         }
         filterSettings.revalidate();
         filterSettings.repaint();
