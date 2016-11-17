@@ -39,6 +39,26 @@ public class FilterListModel extends AbstractListModel<String> {
         fireContentsChanged(this, 0, getSize());
     }
 
+    public void removeFilter(int index) {
+        if (filters == null || filters.isEmpty()) {
+            return;
+        }
+        filters.remove(index);
+        fireContentsChanged(this, index, index);
+    }
+
+    public void switchFilter(int index1, int index2) {
+        if (filters == null || filters.isEmpty()) {
+            return;
+        }
+        ImageFilter imageFilter1 = filters.get(index1);
+        ImageFilter imageFilter2 = filters.get(index2);
+        filters.set(index1, imageFilter2);
+        filters.set(index2, imageFilter1);
+
+        fireContentsChanged(this, index1, index2);
+    }
+
     public int getSize() {
         return filters == null ? 0 : filters.size();
     }

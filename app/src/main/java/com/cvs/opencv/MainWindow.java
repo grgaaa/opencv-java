@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.basic.BasicArrowButton;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -39,7 +40,12 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     private JPanel filterSettings;
     private JButton applyBtn;
     private JButton clearBtn;
+    private JButton retryBtn;
     private JPanel filtersPanel;
+    private JButton upArrowBtn;
+    private JPanel filterActionPanel;
+    private JButton downArrowBtn;
+    private JButton deleteFilterBtn;
 
     private FilterListModel filterListModel = new FilterListModel();
 
@@ -50,12 +56,29 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
         mainWindow.filterList.setModel(mainWindow.filterListModel);
         mainWindow.filterList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         final ListSelectionModel selectionModel = mainWindow.filterList.getSelectionModel();
+
         selectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                int index = selectionModel.getMinSelectionIndex();
-                mainWindow.showFilterSettings(mainWindow.filterListModel.getFilters().get(index));
+                int index = mainWindow.filterList.getSelectedIndex();
+                if (index >= 0) {
+                    mainWindow.showFilterSettings(mainWindow.filterListModel.getFilters().get(index));
+                } else {
+                    mainWindow.clearFilterSettings();
+                }
             }
         });
+        mainWindow.deleteFilterBtn.addMouseListener(new MouseClickListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selectedIndex = mainWindow.filterList.getSelectedIndex();
+                int previousIndex = Math.max(0, selectedIndex-1);
+
+                mainWindow.filterList.setSelectedIndex(previousIndex);
+                ((FilterListModel)mainWindow.filterList.getModel()).removeFilter(selectedIndex);
+            }
+        });
+        mainWindow.upArrowBtn.addMouseListener(new FilterMoveListener(mainWindow, FilterMoveListener.Direction.UP));
+        mainWindow.downArrowBtn.addMouseListener(new FilterMoveListener(mainWindow, FilterMoveListener.Direction.DOWN));
 
         mainWindow.img1.addMouseListener(new ImageSelectListener(jFrame, mainWindow.img1));
         mainWindow.img2.addMouseListener(new ImageSelectListener(jFrame, mainWindow.img2));
@@ -71,6 +94,16 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
                 mainWindow.img1.reloadSourceImage();
                 mainWindow.img2.reloadSourceImage();
                 mainWindow.img3.reloadSourceImage();
+            }
+        });
+        mainWindow.retryBtn.addMouseListener(new ApplyFiltersClickListener(mainWindow) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mainWindow.img1.reloadSourceImage();
+                mainWindow.img2.reloadSourceImage();
+                mainWindow.img3.reloadSourceImage();
+
+                super.mouseClicked(e);
             }
         });
 
@@ -101,7 +134,7 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     }
 
     private void showFilterSettings(ImageFilter filter) {
-        filterSettings.removeAll();
+        clearFilterSettings();
         if (filter != null) {
             Component settingsView = filter.getSettingsView();
 
@@ -114,6 +147,15 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
         }
         filterSettings.revalidate();
         filterSettings.repaint();
+    }
+
+    private void clearFilterSettings() {
+        filterSettings.removeAll();
+    }
+
+    private void createUIComponents() {
+        upArrowBtn = new BasicArrowButton(BasicArrowButton.NORTH);
+        downArrowBtn = new BasicArrowButton(BasicArrowButton.SOUTH);
     }
 
     private static class ApplyFiltersClickListener extends MouseClickListener {
@@ -142,6 +184,7 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
             new Thread(new Runnable() {
                 public void run() {
                     BufferedImage bufferedImage = imagePanel.getBufferedImage();
+
                     Mat imageMat = OpenCV.imageToMat(OpenCV.toBufferedImage(bufferedImage));
 
                     for (ImageFilter imageFilter : imageFilters) {
@@ -151,6 +194,28 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
                     imagePanel.repaint();
                 }
             }).start();
+        }
+    }
+
+    private static class FilterMoveListener extends MouseClickListener {
+        enum Direction {UP, DOWN}
+        private Direction direction;
+        private MainWindow mainWindow;
+
+        public FilterMoveListener(MainWindow mainWindow, Direction direction) {
+            this.mainWindow = mainWindow;
+            this.direction = direction;
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            int fromIndex = mainWindow.filterList.getSelectedIndex();
+            int toIndex = Direction.UP == direction ? fromIndex-1 : fromIndex+1;
+
+            int listSize = mainWindow.filterList.getModel().getSize();
+            if (toIndex >= 0 && toIndex < listSize) {
+                ((FilterListModel)mainWindow.filterList.getModel()).switchFilter(fromIndex, toIndex);
+                mainWindow.filterList.setSelectedIndex(toIndex);
+            }
         }
     }
 
