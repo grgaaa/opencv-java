@@ -47,26 +47,25 @@ public class Canny implements ImageFilter {
     public Component getSettingsView() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        SettingsChangeListener settingsChangeListener = new SettingsChangeListener();
         DefaultFormatter formatter = new DefaultFormatter();
         formatter.setCommitsOnValidEdit(true);
 
         panel.add(new JLabel("threshold1"));
         final JFormattedTextField threshold1Input = new JFormattedTextField(formatter);
         threshold1Input.setText(""+threshold1);
-        threshold1Input.addPropertyChangeListener(SettingsChangeListener.THRESHOLD_1, settingsChangeListener);
+        threshold1Input.addPropertyChangeListener(new SettingsChangeListener(SettingsChangeListener.THRESHOLD_1));
         panel.add(threshold1Input);
 
         panel.add(new JLabel("threshold2"));
         final JFormattedTextField threshold2Input = new JFormattedTextField(formatter);
         threshold2Input.setText(""+threshold2);
-        threshold2Input.addPropertyChangeListener(SettingsChangeListener.THRESHOLD_2, settingsChangeListener);
+        threshold2Input.addPropertyChangeListener(new SettingsChangeListener(SettingsChangeListener.THRESHOLD_2));
         panel.add(threshold2Input);
 
         panel.add(new JLabel("aperture size"));
         final JFormattedTextField apertureSizeInput = new JFormattedTextField(formatter);
         apertureSizeInput.setText(""+apertureSize);
-        apertureSizeInput.addPropertyChangeListener(SettingsChangeListener.APERTURE_SIZE, settingsChangeListener);
+        apertureSizeInput.addPropertyChangeListener(new SettingsChangeListener(SettingsChangeListener.APERTURE_SIZE));
         panel.add(apertureSizeInput);
 
         final JCheckBox L2gradientCheckbox = new JCheckBox("L2gradient", L2gradient);
@@ -86,25 +85,30 @@ public class Canny implements ImageFilter {
         static final String APERTURE_SIZE = "aps";
         static final String L2_GRADIENT = "l2g";
 
+        private String field;
+        public SettingsChangeListener(String field) {
+            this.field = field;
+        }
+
         public void propertyChange(PropertyChangeEvent evt) {
-            String propertyName = evt.getPropertyName();
             Object source = evt.getSource();
-            if (THRESHOLD_1.equals(propertyName)) {
+
+            if (THRESHOLD_1.equals(field)) {
                 JFormattedTextField threshold1Input = (JFormattedTextField)source;
                 if (NumberUtils.isNumber(threshold1Input.getText())) {
                     threshold1 = Double.parseDouble(threshold1Input.getText());
                 }
-            } else if (THRESHOLD_2.equals(propertyName)) {
+            } else if (THRESHOLD_2.equals(field)) {
                 JFormattedTextField threshold2Input = (JFormattedTextField)source;
                 if (NumberUtils.isNumber(threshold2Input.getText())) {
-                    threshold1 = Double.parseDouble(threshold2Input.getText());
+                    threshold2 = Double.parseDouble(threshold2Input.getText());
                 }
-            } else if (APERTURE_SIZE.equals(propertyName)) {
+            } else if (APERTURE_SIZE.equals(field)) {
                 JFormattedTextField apertureSizeInput = (JFormattedTextField)source;
                 if (NumberUtils.isDigits(apertureSizeInput.getText())) {
                     apertureSize = Integer.parseInt(apertureSizeInput.getText());
                 }
-            } else if (L2_GRADIENT.equals(propertyName)) {
+            } else if (L2_GRADIENT.equals(field)) {
                 JCheckBox L2gradientCheckbox = (JCheckBox)source;
                 L2gradient = L2gradientCheckbox.isSelected();
             }

@@ -1,12 +1,10 @@
 package com.cvs.opencv.filters;
 
-import com.cvs.opencv.OpenCV;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class FindSquares implements ImageFilter {
 
     public Mat applyFilter(Mat image) {
 
-        Point[] largestSquare = findLargestSquare(image);
+        MatOfPoint largestSquare= findLargestSquare(image);
 
         if (largestSquare == null) {
             return drawNoSquareDetected(image);
@@ -40,22 +38,12 @@ public class FindSquares implements ImageFilter {
         return null;
     }
 
-    private Mat drawSquare(Mat image, Point[] squarePoints) {
-        BufferedImage bufferedImage = OpenCV.matToImage(image);
+    private Mat drawSquare(Mat image, MatOfPoint square) {
+        ArrayList<MatOfPoint> squareList = new ArrayList<MatOfPoint>();
+        squareList.add(square);
 
-        Graphics2D graphics = bufferedImage.createGraphics();
-        graphics.setColor(Color.RED);
-        BasicStroke stroke = new BasicStroke(10);
-        graphics.setStroke(stroke);
-
-        Polygon polygon = new Polygon();
-        for (Point squarePoint : squarePoints) {
-            polygon.addPoint((int)squarePoint.x, (int)squarePoint.y);
-        }
-        graphics.drawPolygon(polygon);
-        graphics.dispose();
-
-        return OpenCV.imageToMat(bufferedImage);
+        Core.polylines(image, squareList, true, new Scalar(0,0,255), 5);
+        return image;
     }
 
     private Mat drawNoSquareDetected(Mat image) {
@@ -68,7 +56,7 @@ public class FindSquares implements ImageFilter {
     }
 
     // from c++ implementation in https://github.com/jhansireddy/AndroidScannerDemo
-    private Point[] findLargestSquare(Mat image) {
+    private MatOfPoint findLargestSquare(Mat image) {
 
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Imgproc.findContours(image, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -123,7 +111,7 @@ public class FindSquares implements ImageFilter {
                 }
             }
         }
-        return largestSquare.toArray();
+        return largestSquare;
     }
 
     private double angle(Point pt0, Point pt1, Point pt2) {
