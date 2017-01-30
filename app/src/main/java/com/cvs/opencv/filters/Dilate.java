@@ -54,6 +54,7 @@ public class Dilate implements ImageFilter {
 
         panel.add(new JLabel("kernel size"));
         final JFormattedTextField kernelSizeInput = new JFormattedTextField(formatter);
+        kernelSizeInput.setColumns(2);
         kernelSizeInput.setText(""+kernelSize);
         kernelSizeInput.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

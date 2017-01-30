@@ -42,24 +42,31 @@ public class FindSquares implements ImageFilter {
         ArrayList<MatOfPoint> squareList = new ArrayList<MatOfPoint>();
         squareList.add(square);
 
-        Core.polylines(image, squareList, true, new Scalar(0,0,255), 5);
-        return image;
+        Mat bgrImage = new Mat();
+        Imgproc.cvtColor(image, bgrImage, Imgproc.COLOR_GRAY2BGR);
+
+        Imgproc.polylines(bgrImage, squareList, true, new Scalar(255,184,75), 5);
+        return bgrImage;
     }
 
     private Mat drawNoSquareDetected(Mat image) {
-  /*      Mat bgr = new Mat();
-        image.convertTo(bgr, BufferedImage.TYPE_4BYTE_ABGR);*/
-        Core.line(image,
-                new Point(0,0), new Point(image.width(), image.height()),
-                new Scalar(0,0,255), 5);
-        return image;
+        Mat bgrImage = new Mat();
+        Imgproc.cvtColor(image, bgrImage, Imgproc.COLOR_GRAY2BGR);
+
+        Imgproc.line(bgrImage,
+                new Point(0,0), new Point(bgrImage.width(), bgrImage.height()),
+                new Scalar(255,184,75), 5);
+        return bgrImage;
     }
 
     // from c++ implementation in https://github.com/jhansireddy/AndroidScannerDemo
     private MatOfPoint findLargestSquare(Mat image) {
 
+        Mat imageCopy = new Mat();
+        image.copyTo(imageCopy);
+
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-        Imgproc.findContours(image, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(imageCopy, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
         // Test contours
         MatOfPoint2f approx = new MatOfPoint2f();
@@ -88,7 +95,9 @@ public class FindSquares implements ImageFilter {
                     maxCosine = Math.max(maxCosine, cosine);
                 }
 
-                if (maxCosine < 0.3) {
+                // TODO: set back to 0.3
+                System.out.println("maxCosine: "+ maxCosine);
+                if (maxCosine < 0.9) {
                     squares.add(contour);
                 }
             }

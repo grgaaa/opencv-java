@@ -5,6 +5,8 @@ import com.cvs.opencv.view.FilterAddView;
 import com.cvs.opencv.view.FilterListModel;
 import com.cvs.opencv.view.ImagePanel;
 import com.cvs.opencv.view.MouseClickListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
@@ -17,9 +19,13 @@ import javax.swing.plaf.basic.BasicArrowButton;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by gregor.horvat on 26. 07. 2016.
@@ -41,6 +47,7 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     private JButton applyBtn;
     private JButton clearBtn;
     private JButton retryBtn;
+    private JButton saveBtn;
     private JPanel filtersPanel;
     private JButton upArrowBtn;
     private JPanel filterActionPanel;
@@ -48,6 +55,8 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     private JButton deleteFilterBtn;
 
     private FilterListModel filterListModel = new FilterListModel();
+
+    public static final File DEFAULT_WORKING_DIR = new File("C:\\Users\\gregor.horvat.CVSMOBILE\\Desktop\\opencv_test");
 
     public static void main(String[] args) {
         final MainWindow mainWindow = new MainWindow();
@@ -106,9 +115,74 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
                 super.mouseClicked(e);
             }
         });
+        mainWindow.saveBtn.addMouseListener(new MouseClickListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setSelectedFile(DEFAULT_WORKING_DIR);
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("opencv-java config", "config");
+                fileChooser.setFileFilter(filter);
+
+                if (DEFAULT_WORKING_DIR.exists()) {
+                    fileChooser.setCurrentDirectory(DEFAULT_WORKING_DIR);
+                    String selectedFileName = "opencv-java.config";
+
+                    String[] filesList = DEFAULT_WORKING_DIR.list();
+                    Integer fileCopyNumber = null;
+
+                    if (filesList != null) {
+                        for (String fileName : filesList) {
+
+                            Matcher matcher = Pattern.compile("opencv-java(\\((\\d+)\\))?.config").matcher(fileName);
+
+                            if (matcher.find()) {
+                                String copyVersion = matcher.group(2);
+                                if (copyVersion != null) {
+                                    Integer copyVerInt = Integer.valueOf(copyVersion);
+                                    if (fileCopyNumber == null || fileCopyNumber < copyVerInt) {
+                                        selectedFileName = fileName.replace(Character.forDigit(copyVerInt, Character.MAX_RADIX),
+                                                                            Character.forDigit(copyVerInt+1, Character.MAX_RADIX));
+                                        fileCopyNumber = copyVerInt;
+                                    }
+                                } else if (fileCopyNumber == null){
+                                    selectedFileName = "opencv-java(1).config";
+                                }
+                            }
+                        }
+                    }
+                    File selectedFile = new File(DEFAULT_WORKING_DIR, selectedFileName);
+                    fileChooser.setSelectedFile(selectedFile);
+                }
+
+                if (fileChooser.showSaveDialog(mainWindow.mainPanel) == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    try {
+                        if (selectedFile.exists() || selectedFile.createNewFile()) {
+                            try (BufferedWriter writer = new BufferedWriter(new FileWriter(selectedFile))) {
+                                Gson gson = new GsonBuilder().create();
+                                List<ImageFilter> filters = mainWindow.filterListModel.getFilters();
+
+                                for (ImageFilter imageFilter : filters) {
+                                    String filterJson = gson.toJson(imageFilter);
+                                    writer.write(imageFilter.label());
+                                    writer.write(": ");
+                                    writer.write(filterJson);
+                                    writer.newLine();
+                                }
+                                writer.flush();
+                            }
+                        }
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+            }
+        });
 
         mainWindow.filtersPanel.add(new FilterAddView(GrayScale.getDefault(), mainWindow), filterConstraints(0));
-        mainWindow.filtersPanel.add(new FilterAddView(Blur.getDefault(), mainWindow), filterConstraints(1));
+        mainWindow.filtersPanel.add(new FilterAddView(MedianBlur.getDefault(), mainWindow), filterConstraints(1));
         mainWindow.filtersPanel.add(new FilterAddView(Canny.getDefault(), mainWindow), filterConstraints(2));
         mainWindow.filtersPanel.add(new FilterAddView(Dilate.getDefault(), mainWindow), filterConstraints(3));
         mainWindow.filtersPanel.add(new FilterAddView(Threshold.getDefault(), mainWindow), filterConstraints(4));
@@ -222,7 +296,6 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     private static class ImageSelectListener extends MouseClickListener {
         private JFrame jFrame;
         private ImagePanel imgPanel;
-        private final File defaultImagesPath = new File("C:\\Users\\gregor.horvat.CVSMOBILE\\Desktop\\opencv_test");
 
         private ImageSelectListener(JFrame jFrame, ImagePanel imgPanel) {
             this.jFrame = jFrame;
@@ -233,8 +306,8 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & PNG Images", "jpg", "png");
             chooser.setFileFilter(filter);
-            if (defaultImagesPath.exists()) {
-                chooser.setCurrentDirectory(defaultImagesPath);
+            if (DEFAULT_WORKING_DIR.exists()) {
+                chooser.setCurrentDirectory(DEFAULT_WORKING_DIR);
             }
 
             int returnVal = chooser.showOpenDialog(jFrame);

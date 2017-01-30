@@ -72,6 +72,7 @@ public class Threshold implements ImageFilter {
 
         panel.add(new JLabel("thresh"));
         final JFormattedTextField threshInput = new JFormattedTextField(formatter);
+        threshInput.setColumns(3);
         threshInput.setText(""+thresh);
         threshInput.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -84,6 +85,7 @@ public class Threshold implements ImageFilter {
 
         panel.add(new JLabel("maxVal"));
         final JFormattedTextField maxValInput = new JFormattedTextField(formatter);
+        maxValInput.setColumns(3);
         maxValInput.setText(""+maxVal);
         maxValInput.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

@@ -31,7 +31,7 @@ public class Canny implements ImageFilter {
     }
 
     public static ImageFilter getDefault() {
-        return new Canny(10, 30, 3, false);
+        return new Canny(5, 15, 3, true);
     }
 
     public Mat applyFilter(Mat image) {
@@ -52,18 +52,21 @@ public class Canny implements ImageFilter {
 
         panel.add(new JLabel("threshold1"));
         final JFormattedTextField threshold1Input = new JFormattedTextField(formatter);
+        threshold1Input.setColumns(3);
         threshold1Input.setText(""+threshold1);
         threshold1Input.addPropertyChangeListener(new SettingsChangeListener(SettingsChangeListener.THRESHOLD_1));
         panel.add(threshold1Input);
 
         panel.add(new JLabel("threshold2"));
         final JFormattedTextField threshold2Input = new JFormattedTextField(formatter);
+        threshold2Input.setColumns(3);
         threshold2Input.setText(""+threshold2);
         threshold2Input.addPropertyChangeListener(new SettingsChangeListener(SettingsChangeListener.THRESHOLD_2));
         panel.add(threshold2Input);
 
         panel.add(new JLabel("aperture size"));
         final JFormattedTextField apertureSizeInput = new JFormattedTextField(formatter);
+        apertureSizeInput.setColumns(2);
         apertureSizeInput.setText(""+apertureSize);
         apertureSizeInput.addPropertyChangeListener(new SettingsChangeListener(SettingsChangeListener.APERTURE_SIZE));
         panel.add(apertureSizeInput);

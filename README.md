@@ -3,4 +3,4 @@ Java Swing interface for executing some OpenCV functions on selected images. Fee
 
 To run the application:
 
-- add JVM parameter: -Djava.library.path="path to native opencv library" to your run configuration
+- add JVM parameter to your run configuration: -Djava.library.path="path to native opencv library (ie: C:\OpenCV-2.4.6\build\java\x64 -> for 64 bit windows)"
