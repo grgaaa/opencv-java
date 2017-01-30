@@ -5,6 +5,7 @@ import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 
 import java.awt.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,11 @@ public class FindSquares implements ImageFilter {
     }
 
     public Component getSettingsView() {
+        return null;
+    }
+
+    @Override
+    public URL docsUrl() {
         return null;
     }
 

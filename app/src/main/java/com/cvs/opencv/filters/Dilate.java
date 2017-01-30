@@ -9,6 +9,10 @@ import javax.swing.text.DefaultFormatter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * Created by gregor.horvat on 29. 07. 2016.
@@ -80,5 +84,16 @@ public class Dilate implements ImageFilter {
         panel.add(borderValue);
 
         return panel;
+    }
+
+    @Override
+    public URL docsUrl() {
+        try {
+            return new URL("http://www.docs.opencv.org/3.1.0/d4/d86/group__imgproc__filter.html#ga4ff0f3318642c4f469d0e11f242f3b6c");
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

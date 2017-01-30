@@ -12,6 +12,8 @@ import org.opencv.core.Mat;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -23,6 +25,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +56,9 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
     private JPanel filterActionPanel;
     private JButton downArrowBtn;
     private JButton deleteFilterBtn;
+    private JPanel filterVariablesPlaceholder;
+    private JPanel filterDocs;
+    private JTextPane filterDocumentationUrl;
 
     private FilterListModel filterListModel = new FilterListModel();
 
@@ -181,12 +187,27 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
             }
         });
 
+        mainWindow.filterDocumentationUrl.setEditable(false);
+        mainWindow.filterDocumentationUrl.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                try {
+                    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        Desktop.getDesktop().browse(e.getURL().toURI());
+                    }
+                } catch (URISyntaxException|IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+
         mainWindow.filtersPanel.add(new FilterAddView(GrayScale.getDefault(), mainWindow), filterConstraints(0));
         mainWindow.filtersPanel.add(new FilterAddView(MedianBlur.getDefault(), mainWindow), filterConstraints(1));
         mainWindow.filtersPanel.add(new FilterAddView(Canny.getDefault(), mainWindow), filterConstraints(2));
         mainWindow.filtersPanel.add(new FilterAddView(Dilate.getDefault(), mainWindow), filterConstraints(3));
-        mainWindow.filtersPanel.add(new FilterAddView(Threshold.getDefault(), mainWindow), filterConstraints(4));
-        mainWindow.filtersPanel.add(new FilterAddView(FindSquares.getDefault(), mainWindow), filterConstraints(5));
+        mainWindow.filtersPanel.add(new FilterAddView(Erode.getDefault(), mainWindow), filterConstraints(4));
+        mainWindow.filtersPanel.add(new FilterAddView(Threshold.getDefault(), mainWindow), filterConstraints(5));
+        mainWindow.filtersPanel.add(new FilterAddView(FindSquares.getDefault(), mainWindow), filterConstraints(6));
 
         jFrame.setContentPane(mainWindow.mainPanel);
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -217,14 +238,22 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
                 panel.add(new JLabel("No editable options."));
                 settingsView = panel;
             }
-            filterSettings.add(settingsView);
+            filterVariablesPlaceholder.add(settingsView);
+            if (filter.docsUrl() != null) {
+                filterDocumentationUrl.setText(
+                        "<a href=\""+filter.docsUrl().toString()+"\">documentation</a>");
+            } else {
+                filterDocumentationUrl.setText(
+                        "<a href=\"http://www.docs.opencv.org/3.1.0/index.html\">documentation</a>");
+            }
         }
         filterSettings.revalidate();
         filterSettings.repaint();
     }
 
     private void clearFilterSettings() {
-        filterSettings.removeAll();
+        filterVariablesPlaceholder.removeAll();
+        filterDocumentationUrl.setText("");
     }
 
     private void createUIComponents() {
