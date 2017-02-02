@@ -1,7 +1,7 @@
 package com.cvs.opencv;
 
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

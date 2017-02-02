@@ -206,8 +206,9 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
         mainWindow.filtersPanel.add(new FilterAddView(Canny.getDefault(), mainWindow), filterConstraints(2));
         mainWindow.filtersPanel.add(new FilterAddView(Dilate.getDefault(), mainWindow), filterConstraints(3));
         mainWindow.filtersPanel.add(new FilterAddView(Erode.getDefault(), mainWindow), filterConstraints(4));
-        mainWindow.filtersPanel.add(new FilterAddView(Threshold.getDefault(), mainWindow), filterConstraints(5));
-        mainWindow.filtersPanel.add(new FilterAddView(FindSquares.getDefault(), mainWindow), filterConstraints(6));
+        mainWindow.filtersPanel.add(new FilterAddView(MorphologyEx.getDefault(), mainWindow), filterConstraints(5));
+        mainWindow.filtersPanel.add(new FilterAddView(Threshold.getDefault(), mainWindow), filterConstraints(6));
+        mainWindow.filtersPanel.add(new FilterAddView(FindSquares.getDefault(), mainWindow), filterConstraints(7));
 
         jFrame.setContentPane(mainWindow.mainPanel);
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -239,9 +240,8 @@ public class MainWindow implements FilterAddView.OnAddFilterClickListener {
                 settingsView = panel;
             }
             filterVariablesPlaceholder.add(settingsView);
-            if (filter.docsUrl() != null) {
-                filterDocumentationUrl.setText(
-                        "<a href=\""+filter.docsUrl().toString()+"\">documentation</a>");
+            if (filter.filterDocs() != null) {
+                filterDocumentationUrl.setText(filter.filterDocs());
             } else {
                 filterDocumentationUrl.setText(
                         "<a href=\"http://www.docs.opencv.org/3.1.0/index.html\">documentation</a>");

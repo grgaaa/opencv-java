@@ -2,37 +2,62 @@ package com.cvs.opencv.filters;
 
 import com.cvs.opencv.Utils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.opencv.core.*;
+import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 
 import javax.swing.*;
 import javax.swing.text.DefaultFormatter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * Created by gregor.horvat on 29. 07. 2016.
+ * Created by gregor.horvat on 30. 01. 2017.
  */
-public class Dilate implements ImageFilter {
+public class MorphologyEx implements ImageFilter {
 
+    private MorphologyType morphologyType = MorphologyType.values()[0];
+    private int kernelSize = 3;
     private int anchorX = -1;
     private int anchorY = -1;
-    private int kernelSize;
     private int iterations = 1;
     // TODO
-//    private Scalar borderValue;
-//    private int borderType;
+//    private Constants.BorderType borderType;
+//    private int borderValue; // Border value in case of a constant border. The default value has a special meaning.
 
-    public Dilate(int kernelSize) {
-        this.kernelSize = kernelSize;
+    private enum MorphologyType {
+        MORPH_ERODE(Imgproc.MORPH_ERODE),
+        MORPH_DILATE(Imgproc.MORPH_DILATE),
+        MORPH_OPEN(Imgproc.MORPH_OPEN),
+        MORPH_CLOSE(Imgproc.MORPH_CLOSE),
+        MORPH_GRADIENT(Imgproc.MORPH_GRADIENT),
+        MORPH_TOPHAT(Imgproc.MORPH_TOPHAT),
+        MORPH_BLACKHAT(Imgproc.MORPH_BLACKHAT),
+        MORPH_HITMISS(Imgproc.MORPH_HITMISS);
+
+        int type;
+        MorphologyType(int type) {
+            this.type = type;
+        }
+
+        public static String[] names() {
+            MorphologyEx.MorphologyType[] values = MorphologyEx.MorphologyType.values();
+            String[] names = new String[values.length];
+            for (int i = 0; i < values.length; i++) {
+                names[i] = values[i].name();
+            }
+            return names;
+        }
     }
 
-    public static ImageFilter getDefault() {
-        return new Dilate(3);
+    public static MorphologyEx getDefault() {
+        return new MorphologyEx();
     }
 
+    @Override
     public Mat applyFilter(Mat image) {
         Mat dst = new Mat();
         Mat kernel;
@@ -41,12 +66,14 @@ public class Dilate implements ImageFilter {
         } else {
             kernel = new Mat(kernelSize, kernelSize, image.type());
         }
-        Imgproc.dilate(image, dst, kernel, new Point(anchorX, anchorY), iterations);
+        Imgproc.morphologyEx(image, dst, morphologyType.type, kernel,
+                new Point(anchorX, anchorY), iterations);
         return dst;
     }
 
+    @Override
     public String label() {
-        return "Dilate";
+        return "MorphologyEx";
     }
 
     public Component getSettingsView() {
@@ -55,18 +82,18 @@ public class Dilate implements ImageFilter {
         DefaultFormatter formatter = new DefaultFormatter();
         formatter.setCommitsOnValidEdit(true);
 
-        panel.add(new JLabel("kernel size"));
-        final JFormattedTextField kernelSizeInput = new JFormattedTextField(formatter);
-        kernelSizeInput.setColumns(2);
-        kernelSizeInput.setText(""+kernelSize);
-        kernelSizeInput.addPropertyChangeListener(new PropertyChangeListener() {
+        panel.add(new JLabel("kernelSize"));
+        final JFormattedTextField kernelInput = new JFormattedTextField(formatter);
+        kernelInput.setColumns(3);
+        kernelInput.setText(""+kernelSize);
+        kernelInput.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (NumberUtils.isDigits(kernelSizeInput.getText())) {
-                    kernelSize = Integer.parseInt(kernelSizeInput.getText());
+                if (NumberUtils.isDigits(kernelInput.getText())) {
+                    kernelSize = Integer.parseInt(kernelInput.getText());
                 }
             }
         });
-        panel.add(kernelSizeInput);
+        panel.add(kernelInput);
 
         panel.add(new JLabel("anchorX"));
         final JFormattedTextField anchorXInput = new JFormattedTextField(formatter);
@@ -107,20 +134,22 @@ public class Dilate implements ImageFilter {
         });
         panel.add(iterationsInput);
 
-        JLabel borderType = new JLabel("borderType");
-        borderType.setEnabled(false);
-        JLabel borderValue = new JLabel("borderValue");
-        borderValue.setEnabled(false);
-
-        panel.add(borderType);
-        panel.add(borderValue);
+        panel.add(new JLabel("morphType"));
+        final JComboBox morphTypes = new JComboBox(MorphologyEx.MorphologyType.names());
+        morphTypes.setSelectedIndex(morphologyType.ordinal());
+        morphTypes.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                morphologyType = MorphologyEx.MorphologyType.values()[morphTypes.getSelectedIndex()];
+            }
+        });
+        panel.add(morphTypes);
 
         return panel;
     }
 
     @Override
     public String filterDocs() {
-        return Utils.toHtmlUrl("http://www.docs.opencv.org/3.1.0/d4/d86/group__imgproc__filter.html#ga4ff0f3318642c4f469d0e11f242f3b6c",
+        return Utils.toHtmlUrl("http://www.docs.opencv.org/3.1.0/d4/d86/group__imgproc__filter.html#ga67493776e3ad1a3df63883829375201f",
                 "documentation");
     }
 }

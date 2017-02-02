@@ -2,8 +2,7 @@ package com.cvs.opencv.filters;
 
 import com.cvs.opencv.Utils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.opencv.core.*;
-import org.opencv.core.Point;
+import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import javax.swing.*;
@@ -13,24 +12,21 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * Created by gregor.horvat on 29. 07. 2016.
+ * Created by gregor.horvat on 30. 01. 2017.
  */
-public class Dilate implements ImageFilter {
+public class Erode implements ImageFilter {
 
     private int anchorX = -1;
     private int anchorY = -1;
-    private int kernelSize;
+    private int kernelSize = 3;
     private int iterations = 1;
-    // TODO
-//    private Scalar borderValue;
+// TODO
 //    private int borderType;
+//    private Scalar borderValue;
 
-    public Dilate(int kernelSize) {
-        this.kernelSize = kernelSize;
-    }
 
     public static ImageFilter getDefault() {
-        return new Dilate(3);
+        return new Erode();
     }
 
     public Mat applyFilter(Mat image) {
@@ -41,12 +37,12 @@ public class Dilate implements ImageFilter {
         } else {
             kernel = new Mat(kernelSize, kernelSize, image.type());
         }
-        Imgproc.dilate(image, dst, kernel, new Point(anchorX, anchorY), iterations);
+        Imgproc.erode(image, dst, kernel);
         return dst;
     }
 
     public String label() {
-        return "Dilate";
+        return "Erode";
     }
 
     public Component getSettingsView() {
@@ -120,7 +116,7 @@ public class Dilate implements ImageFilter {
 
     @Override
     public String filterDocs() {
-        return Utils.toHtmlUrl("http://www.docs.opencv.org/3.1.0/d4/d86/group__imgproc__filter.html#ga4ff0f3318642c4f469d0e11f242f3b6c",
+        return Utils.toHtmlUrl("http://www.docs.opencv.org/3.1.0/d4/d86/group__imgproc__filter.html#gaeb1e0c1033e3f6b891a25d0511362aeb",
                 "documentation");
     }
 }

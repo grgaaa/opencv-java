@@ -1,5 +1,6 @@
 package com.cvs.opencv.filters;
 
+import com.cvs.opencv.Utils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -11,8 +12,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Created by gregor.horvat on 27. 07. 2016.
@@ -83,14 +82,9 @@ public class Canny implements ImageFilter {
     }
 
     @Override
-    public URL docsUrl() {
-        try {
-            return new URL("http://www.docs.opencv.org/3.1.0/dd/d1a/group__imgproc__feature.html#ga04723e007ed888ddf11d9ba04e2232de");
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public String filterDocs() {
+        return Utils.toHtmlUrl("http://www.docs.opencv.org/3.1.0/dd/d1a/group__imgproc__feature.html#ga04723e007ed888ddf11d9ba04e2232de",
+                "documentation");
     }
 
     private class SettingsChangeListener implements PropertyChangeListener {

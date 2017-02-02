@@ -1,5 +1,6 @@
 package com.cvs.opencv.filters;
 
+import com.cvs.opencv.Utils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -11,8 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Created by gregor.horvat on 1. 08. 2016.
@@ -112,13 +111,8 @@ public class Threshold implements ImageFilter {
     }
 
     @Override
-    public URL docsUrl() {
-        try {
-            return new URL("http://www.docs.opencv.org/3.1.0/d7/d1b/group__imgproc__misc.html#gae8a4a146d1ca78c626a53577199e9c57");
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public String filterDocs() {
+        return Utils.toHtmlUrl("http://www.docs.opencv.org/3.1.0/d7/d1b/group__imgproc__misc.html#gae8a4a146d1ca78c626a53577199e9c57",
+                "documentation");
     }
 }
